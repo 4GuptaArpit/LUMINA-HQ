@@ -1,0 +1,11 @@
+It is a "multi-tenant document analysis  project".
+Multi-tenant architecture is a software design where a single instance of an application serves multiple customers (tenants), ensuring data isolation and security.
+
+Tech-Stack :-
+1. Multi-Tenant = Architecture or Isolated data per organization
+2. Next.js 16 = App router with server components & layouts
+3. PostgreSQL + Prisma = Type-safe database with multi-tenant schema
+4. Clerk = Authentication & organisation management
+5. Google Gemini AI = Document summarization, sentiment analysis & entity extraction
+6. Shadcn/UI + Tailwind = Modern & fast user-interface
+7. Vercel Blob = Secure document storage
