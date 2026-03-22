@@ -3,6 +3,14 @@ import { GoogleGenAI } from "@google/genai";
 const apiKey = process.env.GEMINI_API_KEY;
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
+function isLeakedApiKeyError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    message.includes("API key was reported as leaked") ||
+    message.includes('"status":"PERMISSION_DENIED"')
+  );
+}
+
 export async function analyzeWithGemini(
   text: string,
   analysisType: "summary" | "qa" | "sentiment" | "entities" | "extract",
@@ -38,6 +46,12 @@ export async function analyzeWithGemini(
     return output;
   } catch (error: any) {
     console.error("[Lumina-HQ] Gemini Error:", error);
+    if (isLeakedApiKeyError(error)) {
+      throw new Error(
+        "Gemini API key is blocked. Replace GEMINI_API_KEY in Vercel with a new key and redeploy.",
+      );
+    }
+
     throw new Error(error?.message || `Analysis failed for ${analysisType}`);
   }
 }
