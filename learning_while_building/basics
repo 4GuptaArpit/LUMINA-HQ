@@ -1,2 +1,3 @@
 1. "npx create-next-app@latest lumina-hq" --> used to bootstrap our app. Here "lumina-hq is our app name"
 2. Their is a npm naming restriction. Name no longer takes capital letters.
+3. In header.tsx, import { SignedIn, SignedOut } from @cleck.nextjs didn't work. Shifted to useUser().

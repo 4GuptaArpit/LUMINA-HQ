@@ -9,3 +9,5 @@ Tech-Stack :-
 5. Google Gemini AI = Document summarization, sentiment analysis & entity extraction
 6. Shadcn/UI + Tailwind = Modern & fast user-interface
 7. Vercel Blob = Secure document storage
+
+React-Markdown --> Used for formating of AI response
