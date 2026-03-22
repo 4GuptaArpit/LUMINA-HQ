@@ -4,7 +4,44 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { syncOrganizationMembership } from "@/lib/organization-sync";
 import { canExtractTextFromFile } from "@/lib/document-utils";
-import { extractPdfText, isPdfFile } from "@/lib/pdf";
+import { extractPdfText, extractPdfTextFromUrl, isPdfFile } from "@/lib/pdf";
+
+async function parseDocumentCreateRequest(request: Request) {
+  const contentType = request.headers.get("content-type") || "";
+
+  if (contentType.includes("application/json")) {
+    const body = await request.json();
+
+    return {
+      name: typeof body.name === "string" ? body.name : "",
+      content: typeof body.content === "string" ? body.content : "",
+      organizationId:
+        typeof body.organizationId === "string" ? body.organizationId : "",
+      file: null as File | null,
+      uploadedFileUrl:
+        typeof body.fileUrl === "string" ? body.fileUrl : null,
+      uploadedFileSize:
+        typeof body.fileSize === "number" ? body.fileSize : null,
+      uploadedFileType:
+        typeof body.fileType === "string" ? body.fileType : null,
+    };
+  }
+
+  const formData = await request.formData();
+  const fileEntry = formData.get("file");
+
+  return {
+    name: formData.get("name") as string,
+    content: formData.get("content") as string,
+    organizationId: formData.get("organizationId") as string,
+    file: fileEntry instanceof File ? fileEntry : null,
+    uploadedFileUrl: (formData.get("fileUrl") as string | null) || null,
+    uploadedFileSize: formData.get("fileSize")
+      ? Number(formData.get("fileSize"))
+      : null,
+    uploadedFileType: (formData.get("fileType") as string | null) || null,
+  };
+}
 
 export async function POST(request: Request) {
   try {
@@ -14,18 +51,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const formData = await request.formData();
-    const name = formData.get("name") as string;
-    const content = formData.get("content") as string;
-    const organizationId = formData.get("organizationId") as string;
-    const fileEntry = formData.get("file");
-    const file = fileEntry instanceof File ? fileEntry : null;
+    const {
+      name,
+      content,
+      organizationId,
+      file,
+      uploadedFileUrl,
+      uploadedFileSize,
+      uploadedFileType,
+    } = await parseDocumentCreateRequest(request);
 
     console.log("🔍 API Input:", {
       name,
       organizationId,
       file: file?.name,
-      fileSize: file?.size,
+      fileSize: file?.size || uploadedFileSize,
     });
 
     if (!name || !organizationId) {
@@ -107,9 +147,9 @@ export async function POST(request: Request) {
       );
     }
 
-    let fileUrl = null;
-    let fileSize = null;
-    let fileType = null;
+    let fileUrl = uploadedFileUrl;
+    let fileSize = uploadedFileSize;
+    let fileType = uploadedFileType;
     let extractedContent = content;
 
     // Upload file to Vercel Blob if exists
@@ -129,6 +169,18 @@ export async function POST(request: Request) {
       }
 
       console.log("✅ File uploaded:", { fileUrl, fileSize, fileType });
+    } else if (fileUrl) {
+      if (!extractedContent && canExtractTextFromFile(fileType, name)) {
+        const response = await fetch(fileUrl);
+
+        if (response.ok) {
+          extractedContent = await response.text();
+        }
+      }
+
+      if (!extractedContent && isPdfFile(fileType, name)) {
+        extractedContent = await extractPdfTextFromUrl(fileUrl);
+      }
     }
 
     // Create document - Use DATABASE IDs

@@ -1,7 +1,18 @@
 // lib/blob.ts
-
-"use server";
 import { put, del } from "@vercel/blob";
+
+export function buildBlobPathname(
+  fileName: string,
+  organizationId: string,
+  userId: string,
+) {
+  const sanitizedName = fileName
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9._-]/g, "");
+  const filename = `${Date.now()}-${sanitizedName || "upload"}`;
+
+  return `org-${organizationId}/user-${userId}/${filename}`;
+}
 
 export async function uploadToBlob(
   file: File,
@@ -15,11 +26,7 @@ export async function uploadToBlob(
       throw new Error("Blob storage is not configured");
     }
 
-    const sanitizedName = file.name
-      .replace(/\s+/g, "-")
-      .replace(/[^a-zA-Z0-9._-]/g, "");
-    const filename = `${Date.now()}-${sanitizedName || "upload"}`;
-    const pathname = `org-${organizationId}/user-${userId}/${filename}`;
+    const pathname = buildBlobPathname(file.name, organizationId, userId);
 
     const blob = await put(pathname, file, {
       access: "private",

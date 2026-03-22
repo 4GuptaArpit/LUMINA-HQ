@@ -3,6 +3,7 @@
 
 import { useState, useRef } from "react";
 import { useOrganization, useUser } from "@clerk/nextjs";
+import { upload } from "@vercel/blob/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -79,15 +80,44 @@ export function DocumentUploadDialog({
     }
 
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append("name", documentName);
-    formData.append("organizationId", organization.id);
-
-    if (selectedFile) {
-      formData.append("file", selectedFile);
-    }
 
     try {
+      let uploadedFileUrl: string | null = null;
+      let uploadedFileSize: number | null = null;
+      let uploadedFileType: string | null = null;
+
+      if (selectedFile) {
+        const blob = await upload(selectedFile.name, selectedFile, {
+          access: "private",
+          handleUploadUrl: "/api/documents/upload",
+          multipart: selectedFile.size > 5 * 1024 * 1024,
+          clientPayload: JSON.stringify({
+            fileName: selectedFile.name,
+            organizationId: organization.id,
+          }),
+        });
+
+        uploadedFileUrl = blob.downloadUrl;
+        uploadedFileSize = selectedFile.size;
+        uploadedFileType = selectedFile.type || "unknown";
+      }
+
+      const formData = new FormData();
+      formData.append("name", documentName);
+      formData.append("organizationId", organization.id);
+
+      if (uploadedFileUrl) {
+        formData.append("fileUrl", uploadedFileUrl);
+      }
+
+      if (uploadedFileSize !== null) {
+        formData.append("fileSize", String(uploadedFileSize));
+      }
+
+      if (uploadedFileType) {
+        formData.append("fileType", uploadedFileType);
+      }
+
       const response = await fetch("/api/documents", {
         method: "POST",
         body: formData,

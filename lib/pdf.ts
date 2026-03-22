@@ -1,4 +1,5 @@
 import { createRequire } from "module";
+import { get as getBlob } from "@vercel/blob";
 
 const require = createRequire(import.meta.url);
 const { PDFParse } = require("pdf-parse");
@@ -19,6 +20,21 @@ export async function extractPdfText(file: File) {
 }
 
 export async function extractPdfTextFromUrl(url: string) {
+  const isBlobUrl = url.includes(".blob.vercel-storage.com");
+
+  if (isBlobUrl) {
+    const result = await getBlob(url, {
+      access: "private",
+    });
+
+    if (!result || result.statusCode !== 200 || !result.stream) {
+      throw new Error("Failed to download PDF for analysis");
+    }
+
+    const buffer = new Uint8Array(await new Response(result.stream).arrayBuffer());
+    return extractPdfTextFromBuffer(buffer);
+  }
+
   const response = await fetch(url);
 
   if (!response.ok) {
