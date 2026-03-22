@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///E:/BUILDING/lumina-hq/app/%28dashboard%29/layout.tsx"],"sourcesContent":["import { auth } from \"@clerk/nextjs/server\";\r\nimport { redirect } from \"next/navigation\";\r\n\r\nexport default async function DashboardLayout({\r\n  children,\r\n}: {\r\n  children: React.ReactNode;\r\n}) {\r\n  const { userId } = await auth();\r\n\r\n  if (!userId) {\r\n    redirect(\"/sign-in\");\r\n  }\r\n\r\n  return (\r\n    <div className=\"min-h-screen bg-gray-50\">\r\n      {/* Main Content - Global header now handles navigation */}\r\n      <main className=\"py-8\">\r\n        <div className=\"container mx-auto px-4\">{children}</div>\r\n      </main>\r\n    </div>\r\n  );\r\n}\r\n"],"names":["DashboardLayout","children","userId","className"],"mappings":";;;;;AAAA;AACA;AAAA;;;;AAEe,eAAeA,gBAAgB,EAC5CC,QAAQ,EAGT;IACC,MAAM,EAAEC,MAAM,EAAE,GAAG,MAAM,IAAA,2LAAI;IAE7B,IAAI,CAACA,QAAQ;QACX,IAAA,iMAAQ,EAAC;IACX;IAEA,qBACE,8OAAC;QAAIC,WAAU;kBAEb,cAAA,8OAAC;YAAKA,WAAU;sBACd,cAAA,8OAAC;gBAAIA,WAAU;0BAA0BF;;;;;;;;;;;;;;;;AAIjD"}}]
+}

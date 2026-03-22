@@ -1,0 +1,4 @@
+{
+  "/(dashboard)/[orgSlug]/documents/page": "app/(dashboard)/[orgSlug]/documents/page.js",
+  "/api/documents/route": "app/api/documents/route.js"
+}
