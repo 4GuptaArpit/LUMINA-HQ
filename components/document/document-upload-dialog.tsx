@@ -22,11 +22,13 @@ import { allowedTypes } from "@/app/data/data";
 interface DocumentUploadDialogProps {
   onUploadSuccess?: () => void;
   trigger?: React.ReactNode;
+  organizationSlug?: string;
 }
 
 export function DocumentUploadDialog({
   onUploadSuccess,
   trigger,
+  organizationSlug,
 }: DocumentUploadDialogProps) {
   const { organization } = useOrganization();
   const { user } = useUser();
@@ -69,7 +71,14 @@ export function DocumentUploadDialog({
 
   // Handle upload
   const handleUpload = async () => {
-    if (!organization || !user || !selectedFile) {
+    if (!user || !selectedFile) {
+      toast.error("Please choose a file and an active organization");
+      return;
+    }
+
+    const organizationId = organization?.id ?? null;
+
+    if (!organizationId && !organizationSlug) {
       toast.error("Please choose a file and an active organization");
       return;
     }
@@ -93,7 +102,8 @@ export function DocumentUploadDialog({
           multipart: selectedFile.size > 5 * 1024 * 1024,
           clientPayload: JSON.stringify({
             fileName: selectedFile.name,
-            organizationId: organization.id,
+            organizationId,
+            organizationSlug,
           }),
         });
 
@@ -104,7 +114,12 @@ export function DocumentUploadDialog({
 
       const formData = new FormData();
       formData.append("name", documentName);
-      formData.append("organizationId", organization.id);
+      if (organizationId) {
+        formData.append("organizationId", organizationId);
+      }
+      if (organizationSlug) {
+        formData.append("organizationSlug", organizationSlug);
+      }
 
       if (uploadedFileUrl) {
         formData.append("fileUrl", uploadedFileUrl);
@@ -139,7 +154,7 @@ export function DocumentUploadDialog({
       }
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error("Upload failed");
+      toast.error(error instanceof Error ? error.message : "Upload failed");
     } finally {
       setIsUploading(false);
     }

@@ -2,7 +2,50 @@ import { createRequire } from "module";
 import { get as getBlob } from "@vercel/blob";
 
 const require = createRequire(import.meta.url);
-const { PDFParse } = require("pdf-parse");
+
+function ensurePdfRuntimeGlobals() {
+  try {
+    const {
+      DOMMatrix,
+      DOMPoint,
+      DOMRect,
+      ImageData,
+      Path2D,
+    } = require("@napi-rs/canvas");
+
+    if (typeof globalThis.DOMMatrix === "undefined") {
+      globalThis.DOMMatrix = DOMMatrix;
+    }
+
+    if (typeof globalThis.DOMPoint === "undefined") {
+      globalThis.DOMPoint = DOMPoint;
+    }
+
+    if (typeof globalThis.DOMRect === "undefined") {
+      globalThis.DOMRect = DOMRect;
+    }
+
+    if (typeof globalThis.ImageData === "undefined") {
+      globalThis.ImageData = ImageData;
+    }
+
+    if (typeof globalThis.Path2D === "undefined") {
+      globalThis.Path2D = Path2D;
+    }
+  } catch {
+    // If the canvas polyfill is unavailable, pdf-parse will throw a clearer error on use.
+  }
+}
+
+function getPdfParse() {
+  ensurePdfRuntimeGlobals();
+  return require("pdf-parse") as {
+    PDFParse: new (options: { data: Uint8Array }) => {
+      getText(): Promise<{ text?: string }>;
+      destroy(): Promise<void>;
+    };
+  };
+}
 
 export function isPdfFile(fileType?: string | null, fileName?: string) {
   const normalizedType = (fileType || "").toLowerCase();
@@ -46,6 +89,7 @@ export async function extractPdfTextFromUrl(url: string) {
 }
 
 async function extractPdfTextFromBuffer(buffer: Uint8Array) {
+  const { PDFParse } = getPdfParse();
   const parser = new PDFParse({ data: buffer });
 
   try {

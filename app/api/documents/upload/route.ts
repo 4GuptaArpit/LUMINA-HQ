@@ -8,6 +8,7 @@ import { syncOrganizationMembership } from "@/lib/organization-sync";
 type UploadPayload = {
   fileName?: string;
   organizationId?: string;
+  organizationSlug?: string;
 };
 
 function parseUploadPayload(clientPayload: string | null): UploadPayload {
@@ -36,19 +37,25 @@ export async function POST(request: Request) {
       body,
       request,
       onBeforeGenerateToken: async (_pathname, clientPayload) => {
-        const { fileName, organizationId } = parseUploadPayload(clientPayload);
+        const { fileName, organizationId, organizationSlug } =
+          parseUploadPayload(clientPayload);
 
-        if (!fileName || !organizationId) {
+        if (!fileName || (!organizationId && !organizationSlug)) {
           throw new Error("Missing upload details");
         }
 
         let organization = await prisma.organization.findFirst({
           where: {
-            OR: [{ clerkOrgId: organizationId }, { id: organizationId }],
+            OR: [
+              ...(organizationId
+                ? [{ clerkOrgId: organizationId }, { id: organizationId }]
+                : []),
+              ...(organizationSlug ? [{ slug: organizationSlug }] : []),
+            ],
           },
         });
 
-        if (!organization && organizationId.startsWith("org_")) {
+        if (!organization && organizationId?.startsWith("org_")) {
           const synced = await syncOrganizationMembership(userId, organizationId);
           organization = synced?.organization || null;
         }
@@ -87,6 +94,7 @@ export async function POST(request: Request) {
             "application/msword",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           ],
+          addRandomSuffix: true,
           allowOverwrite: false,
           maximumSizeInBytes: 10 * 1024 * 1024,
           validUntil: Date.now() + 60 * 60 * 1000,

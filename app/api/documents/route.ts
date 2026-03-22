@@ -17,6 +17,8 @@ async function parseDocumentCreateRequest(request: Request) {
       content: typeof body.content === "string" ? body.content : "",
       organizationId:
         typeof body.organizationId === "string" ? body.organizationId : "",
+      organizationSlug:
+        typeof body.organizationSlug === "string" ? body.organizationSlug : "",
       file: null as File | null,
       uploadedFileUrl:
         typeof body.fileUrl === "string" ? body.fileUrl : null,
@@ -34,6 +36,7 @@ async function parseDocumentCreateRequest(request: Request) {
     name: formData.get("name") as string,
     content: formData.get("content") as string,
     organizationId: formData.get("organizationId") as string,
+    organizationSlug: formData.get("organizationSlug") as string,
     file: fileEntry instanceof File ? fileEntry : null,
     uploadedFileUrl: (formData.get("fileUrl") as string | null) || null,
     uploadedFileSize: formData.get("fileSize")
@@ -55,6 +58,7 @@ export async function POST(request: Request) {
       name,
       content,
       organizationId,
+      organizationSlug,
       file,
       uploadedFileUrl,
       uploadedFileSize,
@@ -68,20 +72,25 @@ export async function POST(request: Request) {
       fileSize: file?.size || uploadedFileSize,
     });
 
-    if (!name || !organizationId) {
+    if (!name || (!organizationId && !organizationSlug)) {
       return NextResponse.json(
-        { error: "Name and organization ID are required" },
+        { error: "Name and organization reference are required" },
         { status: 400 },
       );
     }
 
     let organization = await prisma.organization.findFirst({
       where: {
-        OR: [{ clerkOrgId: organizationId }, { id: organizationId }],
+        OR: [
+          ...(organizationId
+            ? [{ clerkOrgId: organizationId }, { id: organizationId }]
+            : []),
+          ...(organizationSlug ? [{ slug: organizationSlug }] : []),
+        ],
       },
     });
 
-    if (!organization && organizationId.startsWith("org_")) {
+    if (!organization && organizationId?.startsWith("org_")) {
       const synced = await syncOrganizationMembership(userId, organizationId);
       organization = synced?.organization || null;
     }
@@ -254,21 +263,27 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const organizationId = searchParams.get("organizationId");
+    const organizationSlug = searchParams.get("organizationSlug");
 
-    if (!organizationId) {
+    if (!organizationId && !organizationSlug) {
       return NextResponse.json(
-        { error: "Organization ID is required" },
+        { error: "Organization reference is required" },
         { status: 400 },
       );
     }
 
     let organization = await prisma.organization.findFirst({
       where: {
-        OR: [{ clerkOrgId: organizationId }, { id: organizationId }],
+        OR: [
+          ...(organizationId
+            ? [{ clerkOrgId: organizationId }, { id: organizationId }]
+            : []),
+          ...(organizationSlug ? [{ slug: organizationSlug }] : []),
+        ],
       },
     });
 
-    if (!organization && organizationId.startsWith("org_")) {
+    if (!organization && organizationId?.startsWith("org_")) {
       const synced = await syncOrganizationMembership(userId, organizationId);
       organization = synced?.organization || null;
     }

@@ -14,10 +14,11 @@ export async function POST(request: Request) {
     }
 
     // 2. Get request data
-    const { documentId, organizationId, analysisType } = await request.json();
-    if (!documentId || !organizationId) {
+    const { documentId, organizationId, organizationSlug, analysisType } =
+      await request.json();
+    if (!documentId || (!organizationId && !organizationSlug)) {
       return NextResponse.json(
-        { error: "Missing document or organization ID" },
+        { error: "Missing document or organization reference" },
         { status: 400 },
       );
     }
@@ -42,7 +43,12 @@ export async function POST(request: Request) {
       where: {
         id: documentId,
         organization: {
-          OR: [{ clerkOrgId: organizationId }, { id: organizationId }],
+          OR: [
+            ...(organizationId
+              ? [{ clerkOrgId: organizationId }, { id: organizationId }]
+              : []),
+            ...(organizationSlug ? [{ slug: organizationSlug }] : []),
+          ],
           members: {
             some: {
               user: { clerkUserId: userId },
@@ -58,7 +64,12 @@ export async function POST(request: Request) {
         where: {
           id: documentId,
           organization: {
-            OR: [{ clerkOrgId: organizationId }, { id: organizationId }],
+            OR: [
+              ...(organizationId
+                ? [{ clerkOrgId: organizationId }, { id: organizationId }]
+                : []),
+              ...(organizationSlug ? [{ slug: organizationSlug }] : []),
+            ],
             members: {
               some: {
                 user: { clerkUserId: userId },

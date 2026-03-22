@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { useOrganization } from "@clerk/nextjs";
 import {
   Card,
@@ -18,6 +19,9 @@ import { DocumentCard } from "@/components/document/document-card";
 
 export default function DocumentsPage() {
   const { organization } = useOrganization();
+  const params = useParams<{ orgSlug: string }>();
+  const orgSlug =
+    typeof params?.orgSlug === "string" ? params.orgSlug : undefined;
 
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +38,7 @@ export default function DocumentsPage() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `/api/documents?organizationId=${organization.id}`,
+        `/api/documents?organizationSlug=${encodeURIComponent(orgSlug || "")}`,
       );
       if (response.ok) {
         const data = await response.json();
@@ -78,7 +82,8 @@ export default function DocumentsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           documentId,
-          organizationId: organization.id,
+          organizationId: organization?.id,
+          organizationSlug: orgSlug,
           analysisType: selectedAnalysisType,
         }),
       });
@@ -141,7 +146,10 @@ export default function DocumentsPage() {
         </div>
 
         {/* Upload Dialog */}
-        <DocumentUploadDialog onUploadSuccess={fetchDocuments} />
+        <DocumentUploadDialog
+          onUploadSuccess={fetchDocuments}
+          organizationSlug={orgSlug}
+        />
       </div>
 
       {/* Stats Bar */}
