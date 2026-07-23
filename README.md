@@ -24,14 +24,19 @@
 
 **Lumina-HQ** is an agentic workspace designed for modern, forward-thinking teams. It enables organizations to upload complex documents (PDFs, Markdown, text files) and run powerful AI-driven analysis workflows. With **enterprise-grade tenant isolation**, Lumina-HQ ensures that organizational knowledge remains strictly private, accessible only to authorized members, and is processed securely using top-tier models.
 
+### 🏠 Landing Page
+<p align="center">
+  <img src="ss/first.png" alt="Lumina-HQ Landing Page" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
+</p>
+
 ---
 
-## 📸 Product Mockup
+## 📸 Workspace Dashboard
 
-Below is a preview of the **Lumina-HQ** workspace dashboard, featuring document uploads, processed document summaries, tone & sentiment analysis, and keyword tag clouds.
+Below is a preview of the **Lumina-HQ** workspace dashboard, featuring document uploads, processed document statistics, and a list of recently analyzed files.
 
 <p align="center">
-  <img src="public/lumina_hq_mockup.png" alt="Lumina-HQ Dashboard Mockup" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
+  <img src="ss/fourth.png" alt="Lumina-HQ Workspace Dashboard" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
 </p>
 
 ---
@@ -83,6 +88,14 @@ graph TD
     end
 ```
 
+### 🏢 Multi-Tenant Organization Setup
+
+Lumina-HQ guides teams through a seamless workspace isolation process. Users can create a new organization or switch between existing active tenants.
+
+| Stage 1: Empty Organization State | Stage 2: Selection List with Created Tenant |
+| :---: | :---: |
+| <img src="ss/second.png" alt="Create Org Empty State" width="100%" style="border-radius: 8px; border: 1px solid #e2e8f0;" /> | <img src="ss/third.png" alt="Select Org Active State" width="100%" style="border-radius: 8px; border: 1px solid #e2e8f0;" /> |
+
 ---
 
 ## ⚡ Core Features & AI Workflows
@@ -96,6 +109,22 @@ Lumina-HQ offers five specialized AI-driven analysis models to extract value and
 | **Tone & Intent** | `sentiment` | Detect emotional undertones, risk areas, and communication styles in text. | 📝 |
 | **Entity Map** | `entities` | Identify and link key legal entities, figures, dates, and organizations. | 🏷️ |
 | **Structured Data** | `extract` | Convert raw, unstructured text files into clean, production-ready JSON schemas. | 📊 |
+
+### 🤖 Live AI Analysis Workflows
+
+Here is a live demonstration of our Gemini AI-driven models processing a sample resume inside the workspace:
+
+#### 1. Synthesis (Executive Summary) Workflow
+* Distills the document into technical foundation highlights, project focus areas, main findings, and key action items for reviewers.
+<p align="center">
+  <img src="ss/fifth.png" alt="Synthesis Executive Summary Mode" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
+</p>
+
+#### 2. Interrogation (Cited Q&A) Workflow
+* Asks targeted questions about academic pursuits, core project architecture, real-time sync systems, and certifications, providing fact-cited answers.
+<p align="center">
+  <img src="ss/sixth.png" alt="Interrogation Q&A Mode" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
+</p>
 
 ### 🔒 Enterprise-Grade Security
 * **Isolated Tenancy:** Every document belongs strictly to a Clerk Organization ID. Queries are partitioned at the database level.
@@ -124,7 +153,8 @@ lumina-hq/
 │   └── utils.ts              # Styling merge and common utility functions
 ├── prisma/                   # Database schema definitions and migrations
 │   └── schema.prisma         # Postgres models (User, Org, Doc)
-├── public/                   # Static public assets (SVGs, generated banners)
+├── public/                   # Static public assets (SVGs, generated banners, screenshots)
+├── ss/                       # Screenshot assets for GitHub repository homepage
 ├── package.json              # App scripts and dependencies
 └── tsconfig.json             # TypeScript rules configuration
 ```
