@@ -26,7 +26,7 @@
 
 ### 🏠 Landing Page
 <p align="center">
-  <img src="ss/first.png" alt="Lumina-HQ Landing Page" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
+  <img src="public/ss/first.png" alt="Lumina-HQ Landing Page" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
 </p>
 
 ---
@@ -36,7 +36,7 @@
 Below is a preview of the **Lumina-HQ** workspace dashboard, featuring document uploads, processed document statistics, and a list of recently analyzed files.
 
 <p align="center">
-  <img src="ss/fourth.png" alt="Lumina-HQ Workspace Dashboard" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
+  <img src="public/ss/fourth.png" alt="Lumina-HQ Workspace Dashboard" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
 </p>
 
 ---
@@ -65,7 +65,7 @@ graph TD
     subgraph Security ["2. Storage & Security Layer"]
         PP -->|Parsed Text & Metadata| P[Prisma Client]:::security
         P -->|Save Record| DB[(PostgreSQL Database)]:::storage
-        
+
         subgraph Tenancy ["Multi-Tenant Isolation"]
             Auth[Clerk Auth Guard]:::security -->|Enforces| Org[Organization Domain Isolation]:::security
             Org -->|Restricts Access| DB
@@ -94,7 +94,7 @@ Lumina-HQ guides teams through a seamless workspace isolation process. Users can
 
 | Stage 1: Empty Organization State | Stage 2: Selection List with Created Tenant |
 | :---: | :---: |
-| <img src="ss/second.png" alt="Create Org Empty State" width="100%" style="border-radius: 8px; border: 1px solid #e2e8f0;" /> | <img src="ss/third.png" alt="Select Org Active State" width="100%" style="border-radius: 8px; border: 1px solid #e2e8f0;" /> |
+| <img src="public/ss/second.png" alt="Create Org Empty State" width="100%" style="border-radius: 8px; border: 1px solid #e2e8f0;" /> | <img src="public/ss/third.png" alt="Select Org Active State" width="100%" style="border-radius: 8px; border: 1px solid #e2e8f0;" /> |
 
 ---
 
@@ -117,13 +117,13 @@ Here is a live demonstration of our Gemini AI-driven models processing a sample 
 #### 1. Synthesis (Executive Summary) Workflow
 * Distills the document into technical foundation highlights, project focus areas, main findings, and key action items for reviewers.
 <p align="center">
-  <img src="ss/fifth.png" alt="Synthesis Executive Summary Mode" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
+  <img src="public/ss/fifth.png" alt="Synthesis Executive Summary Mode" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
 </p>
 
 #### 2. Interrogation (Cited Q&A) Workflow
 * Asks targeted questions about academic pursuits, core project architecture, real-time sync systems, and certifications, providing fact-cited answers.
 <p align="center">
-  <img src="ss/sixth.png" alt="Interrogation Q&A Mode" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
+  <img src="public/ss/sixth.png" alt="Interrogation Q&A Mode" width="100%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;" />
 </p>
 
 ### 🔒 Enterprise-Grade Security
